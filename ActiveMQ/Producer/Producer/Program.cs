@@ -5,7 +5,7 @@ namespace Producer
 {
     class Program
     {
-        private static void SendNewMessage(string text)
+        private static void SendNewMessageTopic(string text)
         {
             string topic = "TestTopic";
 
@@ -27,6 +27,30 @@ namespace Producer
                 }
             }
         }
+        private static void SendNewMessageQueue(string text)
+        {
+            string queueName = "TestQueue";
+
+            Console.WriteLine($"Adding message to queue topic: {queueName}");
+
+            string brokerUri = $"activemq:tcp://localhost:61616";  // Default port
+            NMSConnectionFactory factory = new NMSConnectionFactory(brokerUri);
+
+            using (IConnection connection = factory.CreateConnection())
+            {
+                connection.Start();
+
+                using (ISession session = connection.CreateSession(AcknowledgementMode.AutoAcknowledge))
+                using (IDestination dest = session.GetQueue(queueName))
+                using (IMessageProducer producer = session.CreateProducer(dest))
+                {
+                    producer.DeliveryMode = MsgDeliveryMode.Persistent;
+
+                    producer.Send(session.CreateTextMessage(text));
+                    Console.WriteLine($"Sent {text} messages");
+                }
+            }
+        }
 
         static void Main(string[] args)
         {
@@ -34,7 +58,8 @@ namespace Producer
             {
                 string text = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(text)) return;
-                SendNewMessage(text);
+                //SendNewMessageTopic(text);
+                SendNewMessageQueue(text);
             }
         }
     }
