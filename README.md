@@ -1,4 +1,4 @@
 # Experiments
 
 Експеремнет 1:
-  RabbitMQ on C#: make Producer and Consumer programs
+  ActiveMQ on C#: make Producer and Consumer programs
